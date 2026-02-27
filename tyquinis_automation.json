@@ -33,12 +33,6 @@
       ],
       "id": "81344acf-5be2-4b6b-84be-c52b936a6a56",
       "name": "Enviar texto",
-      "credentials": {
-        "evolutionApi": {
-          "id": "tvM5Ms8KVCCVzxHC",
-          "name": "Evolution - Tyquínis"
-        }
-      }
     },
     {
       "parameters": {
@@ -92,12 +86,6 @@
       "retryOnFail": false,
       "maxTries": 3,
       "waitBetweenTries": 1000,
-      "credentials": {
-        "openRouterApi": {
-          "id": "KtLhrHsr2tdS0WRr",
-          "name": "OpenRouter - Wagner"
-        }
-      }
     },
     {
       "parameters": {
@@ -119,7 +107,7 @@
         "description": "Esta ferramenta executa um sub-workflow responsável por consultar a lista de produtos da loja TYQUÍNIS diretamente no banco de dados (Supabase).\n\nUse esta ferramenta sempre que o cliente:\n\ninformar que gostou de um produto\n\nmencionar o nome de um produto (mesmo que parcialmente)\n\npedir o preço de um biquíni ou acessório\n\nsolicitar informações como valor, tamanhos ou cores\n\nenviar o nome ou link de um produto do site\n\nA ferramenta retorna, quando encontrado:\n\nnome do produto\n\ndescricao do produto\n\nvalor (preço correto)\n\ntamanhos disponíveis\n\ncores disponíveis\n\nRegras importantes:\n\nNunca inventar preços ou informações.\n\nSe nenhum produto for encontrado, pedir ao cliente que informe o nome do produto como aparece no site.\n\nSe retornar mais de um produto, solicitar que o cliente escolha qual deseja.\n\nUsar os dados retornados para responder o cliente de forma clara e objetiva.",
         "workflowId": {
           "__rl": true,
-          "value": "GnLriHBa2dnGk8xB",
+          "value": "SUB_WORKFLOW_ID",
           "mode": "list",
           "cachedResultUrl": "/workflow/GnLriHBa2dnGk8xB",
           "cachedResultName": "[Sub Workflow] Obter produtos Tyquínis"
@@ -155,7 +143,7 @@
             {
               "id": "e0778b99-572b-44bc-96a2-f0c6f8f62ec9",
               "name": "sessionId",
-              "value": "={{ $json.body?.data.key.remoteJid || '5521964991785@s.whatsapp.net' }}",
+              "value": "={{ $json.body?.data.key.remoteJid || 'SEU_NUMERO@s.whatsapp.net' }}",
               "type": "string"
             }
           ]
@@ -258,11 +246,9 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "63212536-9192-4a24-b5b7-31ebbc43879c",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "4dbfd141014d94107c5456e99747f15ddb05127d7891ea633a90a28270098bd5"
+    
   },
-  "id": "dloR9hTo0-4p5-zP1EIIE",
   "tags": []
 }
