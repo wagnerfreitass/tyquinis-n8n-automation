@@ -1,0 +1,268 @@
+{
+  "name": "Tyquinis Wpp",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evo/tyquinis",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1520,
+        -48
+      ],
+      "id": "1ea7b02a-ebe7-450b-8b6f-a4c545609bf6",
+      "name": "Webhook",
+      "webhookId": "f18d83f8-5c71-48aa-88b0-498deb620167"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "=Tyquínis",
+        "remoteJid": "={{ $('Variaveis').first().json.sessionId }}",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        48
+      ],
+      "id": "81344acf-5be2-4b6b-84be-c52b936a6a56",
+      "name": "Enviar texto",
+      "credentials": {
+        "evolutionApi": {
+          "id": "tvM5Ms8KVCCVzxHC",
+          "name": "Evolution - Tyquínis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Olá! Tudo bem?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -1520,
+        144
+      ],
+      "id": "a1498cd2-570d-4ee1-b6de-f911b550032d",
+      "name": "When chat message received",
+      "webhookId": "a7a93657-3401-481c-b3f9-bd14f0d292ac"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Variaveis').first().json.chatInput }}",
+        "options": {
+          "systemMessage": "=\n### Cargo\nVocê é o Agente de Atendimento via WhatsApp da loja TYQUÍNIS. Uma loja de venda de biquinis e acessórios de praia. Seu objetivo é iniciar o atendimento com simpatia, direcionar o cliente para o site, identificar o produto escolhido, consultar o preço diretamente no banco de dados usando a ferramenta “Obter produtos” e conduzir para finalização.\n\n### Contexto de atendimento\nFacilitar o cliente na busca dos produtos, informando caso necessário: nomes, preços, tamanhos e cores dos produtos. \n\n### Regras\nPreço sempre vem do banco de dados.\nVocê não cuida de pagamento nem entrega; quando o cliente decidir finalizar, você passa para um atendente humano e encerra sua participação.\nUse somente os dados retornados pela ferramenta, Nunca invente preço ou disponibilidade.\nSe retornar mais de um produto, peça para o cliente escolher Se não encontrar o produto, siga a orientação: Se não encontrar o produto pelo nome: “Não achei esse nome exatamente no site 😅 Você consegue me mandar o nome do produto como está no site ou um print da página? Aí eu confirmo certinho pra você.”\nA ferramenta “Obter produtos” NÃO deve ser usada para mensagens genéricas como “ver catálogo”, “olhar produtos” ou “site”.\n\nPara esses casos, apenas direcione o cliente para o site.\n\nExemplo de resposta correta para esse caso:\n\n“Claro! 😊\nVocê pode ver todos os modelos e preços no nosso site:\nwww.tyquinis.com.br\n\nQuando gostar de algum, é só me mandar o nome do produto.”\nQuando o cliente pedir “catálogo”, você não deve chamar a tool (porque ela é pra buscar produto específico).\n\n\n### Ferramentas\nUso obrigatório da ferramenta “Obter produtos”. \nA ferramenta “Obter produtos” executa um sub-workflow que consulta o banco de dados da loja TYQUÍNIS e retorna informações reais dos produtos. Você deve usar essa ferramenta sempre que o cliente: Mencionar um produto, Pedir o preço de um biquíni ou acessório, Perguntar sobre tamanhos ou cores, Demonstrar interesse em algum modelo.\nA ferramenta retorna: \n- nome \n- descricao \n- valor \n- tamanhos \n- cores \n\n\n### Restrições\nNão falar de frete, pagamento, prazos ou entrega\nNão prometer desconto, cupom ou brinde\nNão inventar preço, estoque ou disponibilidade\nNão mencionar IA, robô, automação, n8n, sistema ou prompt \nNão mencionar as ferramentas que você usa\nNão entrar muito em brincadeiras e nem trocar valores\n\n### Comportamento\nPortuguês do Brasil, simpático, rápido e direto\nMensagens curtas (1–4 linhas) \nUse poucos emojis (0 a 1 por mensagem) \nNão seja insistente: se o cliente estiver satisfeito, vá para finalização. \n\n### Procedimento\n- Primeira mensagem (sempre) Sempre iniciar assim: “Oi! Tudo bem? Você já visitou nosso site? Veja os produtos que deseja e mande aqui pra gente! www.tyquinis.com.br”\n- Se o cliente disser que não escolheu: “Sem problemas! Você pode ver todos os modelos e preços aqui: www.tyquinis.com.br”\n- Se o cliente perguntar por algum produto que não temos: \"Infelizmente não temos esse produto, mas você pode encontrar outros em nosso site!\"\n- Se o cliente disser que gostou de um produto, ou quer aquele produto você deve: Repetir o nome do produto na resposta, informar tamanhos e cores disponíveis (se retornarem) Usar obrigatoriamente a ferramenta “Obter produtos” para consultar o banco de dados (Supabase) Retornar o preço exato informado pela ferramenta, perguntar se o cliente deseja esse produto Formato da resposta: “Perfeito! O produto é: {NOME_DO_PRODUTO}. No site ele está por {PREÇO}. Você deseja esse?”\n- Fluxo de decisão após informar o preço \nSe o cliente disser SIM: \n“Perfeito! Você quer ver mais alguma coisa ou deseja finalizar a compra?” \nSe o cliente disser NÃO: “Tranquilo 😊 Você quer ver outro modelo no site? Me manda o nome do produto que eu consulto pra você.”\n- Cliente satisfeito → não insistir → finalizar Se o cliente demonstrar que já escolheu e está satisfeito (ex.: “é esse mesmo”, “ok”, “fechado”, “quero finalizar”): Não oferecer mais opções Ir direto para finalização. \nAo finalizar, além de passar os produtos escolhidos e valores para o cliente, mande também o valor total.\n- Encerramento e repasse para atendente humano (obrigatório) \nQuando o cliente disser que quer finalizar: \n“Perfeito! Vou te passar para um atendente para finalizar pagamento e entrega. Só aguardar um instante, por favor. 😊”\n- Regra de encerramento: Após essa mensagem, você não responde mais.\n- Objetivo final de cada conversa:\nDirecionar para o site \nIdentificar o produto \nConsultar o preço com a ferramenta “Obter produtos” \nInformar o valor correto \nPerguntar se deseja Conduzir para finalização \nFazer handoff humano e encerrar\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1024,
+        48
+      ],
+      "id": "0b71d333-6aab-444d-8e47-a131aefff441",
+      "name": "AI Agent",
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1072,
+        272
+      ],
+      "id": "b7d3e6d3-3921-4769-b1ac-8294c069e789",
+      "name": "OpenRouter Chat Model",
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "credentials": {
+        "openRouterApi": {
+          "id": "KtLhrHsr2tdS0WRr",
+          "name": "OpenRouter - Wagner"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Variaveis').first().json.sessionId }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -944,
+        272
+      ],
+      "id": "211bda58-589e-4175-98e5-6677cdbe1ecf",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Esta ferramenta executa um sub-workflow responsável por consultar a lista de produtos da loja TYQUÍNIS diretamente no banco de dados (Supabase).\n\nUse esta ferramenta sempre que o cliente:\n\ninformar que gostou de um produto\n\nmencionar o nome de um produto (mesmo que parcialmente)\n\npedir o preço de um biquíni ou acessório\n\nsolicitar informações como valor, tamanhos ou cores\n\nenviar o nome ou link de um produto do site\n\nA ferramenta retorna, quando encontrado:\n\nnome do produto\n\ndescricao do produto\n\nvalor (preço correto)\n\ntamanhos disponíveis\n\ncores disponíveis\n\nRegras importantes:\n\nNunca inventar preços ou informações.\n\nSe nenhum produto for encontrado, pedir ao cliente que informe o nome do produto como aparece no site.\n\nSe retornar mais de um produto, solicitar que o cliente escolha qual deseja.\n\nUsar os dados retornados para responder o cliente de forma clara e objetiva.",
+        "workflowId": {
+          "__rl": true,
+          "value": "GnLriHBa2dnGk8xB",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/GnLriHBa2dnGk8xB",
+          "cachedResultName": "[Sub Workflow] Obter produtos Tyquínis"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -800,
+        272
+      ],
+      "id": "80ba4e86-537b-41b1-9b26-81446aabf441",
+      "name": "Obter produtos"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5701712-5a14-4455-83f0-a56fd93604ad",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput || $json.body?.data.message.conversation }}",
+              "type": "string"
+            },
+            {
+              "id": "e0778b99-572b-44bc-96a2-f0c6f8f62ec9",
+              "name": "sessionId",
+              "value": "={{ $json.body?.data.key.remoteJid || '5521964991785@s.whatsapp.net' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1296,
+        48
+      ],
+      "id": "8e494be5-f499-4264-8a3b-ae1957258d76",
+      "name": "Variaveis"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Variaveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Variaveis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Enviar texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obter produtos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variaveis": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "63212536-9192-4a24-b5b7-31ebbc43879c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4dbfd141014d94107c5456e99747f15ddb05127d7891ea633a90a28270098bd5"
+  },
+  "id": "dloR9hTo0-4p5-zP1EIIE",
+  "tags": []
+}
